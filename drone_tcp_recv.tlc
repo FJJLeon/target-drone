@@ -1,5 +1,5 @@
 %% File : drone_tcp_recv.tlc
-%% Created : Wed Mar 24 15:47:20 2021
+%% Created : Wed Apr 07 19:17:51 2021
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -46,6 +46,7 @@
 			const int32_T *para_port, const int_T p_width1);
     SFB_EXTERN_C void drone_tcp_recv_Outputs_wrapper_accel(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
@@ -73,6 +74,7 @@
 			const int32_T *para_port, const int_T p_width1);
     extern void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
@@ -88,11 +90,13 @@
     }
     void drone_tcp_recv_Outputs_wrapper_accel(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1){
     drone_tcp_recv_Outputs_wrapper(u0,
 			y0,
+			received,
 			pW,
 			para_addr, p_width0,
 			para_port, p_width1);
@@ -123,6 +127,7 @@
 
     extern void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
@@ -179,6 +184,7 @@
   %assign ppw = LibBlockDWorkAddr(PWORK, "", "", 0)
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   %assign nelements1 = LibBlockParameterSize(P1)
   %assign param_width1 = nelements1[0] * nelements1[1]
   %if (param_width1) > 1
@@ -195,9 +201,9 @@
   %endif
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    drone_tcp_recv_Outputs_wrapper_accel(%<pu0>, %<py0>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
+    drone_tcp_recv_Outputs_wrapper_accel(%<pu0>, %<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
   %else
-    drone_tcp_recv_Outputs_wrapper(%<pu0>, %<py0>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
+    drone_tcp_recv_Outputs_wrapper(%<pu0>, %<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
   %endif
 
   %%

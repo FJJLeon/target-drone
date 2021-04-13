@@ -129,6 +129,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
  *
  */
 void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
+			const int8_T *received,
 			int32_T *y0,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
@@ -151,7 +152,12 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
         int32_T vw;
     } Posture;
     const int POSTURE_SIZE = sizeof(Posture);
-    
+    中文变量 = 1;
+    if (*received == 0) {
+        ssPrintf("[tcp_send] not received, not send\n");
+        return;
+    }
+
     // retrieve TCP Socket from pWork
     SOCKET *pSock = (SOCKET *)pW[0];
     int iResult;

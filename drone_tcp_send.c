@@ -26,14 +26,14 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Wed Mar 24 15:57:30 2021
+ * Created: Tue Apr 06 20:34:42 2021
  */
 
 #define S_FUNCTION_LEVEL 2
 #define S_FUNCTION_NAME drone_tcp_send
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS            1
+#define NUM_INPUTS            2
 /* Input Port  0 */
 #define IN_PORT_0_NAME        u0
 #define INPUT_0_WIDTH         1
@@ -51,6 +51,23 @@
 #define IN_0_FRACTIONLENGTH   9
 #define IN_0_BIAS             0
 #define IN_0_SLOPE            0.125
+/* Input Port  1 */
+#define IN_PORT_1_NAME        received
+#define INPUT_1_WIDTH         1
+#define INPUT_DIMS_1_COL      1
+#define INPUT_1_DTYPE         int8_T
+#define INPUT_1_COMPLEX       COMPLEX_NO
+#define IN_1_FRAME_BASED      FRAME_NO
+#define IN_1_BUS_BASED        0
+#define IN_1_BUS_NAME         
+#define IN_1_DIMS             1-D
+#define INPUT_1_FEEDTHROUGH   1
+#define IN_1_ISSIGNED         0
+#define IN_1_WORDLENGTH       8
+#define IN_1_FIXPOINTSCALING  1
+#define IN_1_FRACTIONLENGTH   9
+#define IN_1_BIAS             0
+#define IN_1_SLOPE            0.125
 
 #define NUM_OUTPUTS           1
 /* Output Port  0 */
@@ -111,6 +128,7 @@ extern void drone_tcp_send_Start_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
 extern void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
+			const int8_T *received,
 			int32_T *y0,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
@@ -203,6 +221,13 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetInputPortComplexSignal(S, 0, INPUT_0_COMPLEX);
     ssSetInputPortDirectFeedThrough(S, 0, INPUT_0_FEEDTHROUGH);
     ssSetInputPortRequiredContiguous(S, 0, 1); /*direct input signal access*/
+
+    /* Input Port 1 */
+    ssSetInputPortWidth(S, 1, INPUT_1_WIDTH);
+    ssSetInputPortDataType(S, 1, SS_INT8);
+    ssSetInputPortComplexSignal(S, 1, INPUT_1_COMPLEX);
+    ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
+    ssSetInputPortRequiredContiguous(S, 1, 1); /*direct input signal access*/
 
 
     if (!ssSetNumOutputPorts(S, NUM_OUTPUTS)) return;
@@ -299,13 +324,14 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
     void **pW = ssGetPWork(S);
     const int32_T *u0 = (int32_T *) ssGetInputPortRealSignal(S, 0);
+    const int8_T *received = (int8_T *) ssGetInputPortRealSignal(S, 1);
     int32_T *y0 = (int32_T *) ssGetOutputPortRealSignal(S, 0);
     const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
     const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
     const uint8_T *para_addr = (const uint8_T *) mxGetData(PARAM_DEF0(S));
     const int32_T *para_port = (const int32_T *) mxGetData(PARAM_DEF1(S));
     
-    drone_tcp_send_Outputs_wrapper(u0, y0, pW, para_addr, p_width0, para_port, p_width1);
+    drone_tcp_send_Outputs_wrapper(u0, received, y0, pW, para_addr, p_width0, para_port, p_width1);
 
 }
 

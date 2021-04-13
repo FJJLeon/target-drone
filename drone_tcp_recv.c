@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Wed Mar 24 15:47:20 2021
+ * Created: Wed Apr 07 19:17:51 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -52,7 +52,7 @@
 #define IN_0_BIAS             0
 #define IN_0_SLOPE            0.125
 
-#define NUM_OUTPUTS           1
+#define NUM_OUTPUTS           2
 /* Output Port  0 */
 #define OUT_PORT_0_NAME       y0
 #define OUTPUT_0_WIDTH        1
@@ -69,6 +69,22 @@
 #define OUT_0_FRACTIONLENGTH  3
 #define OUT_0_BIAS            0
 #define OUT_0_SLOPE           0.125
+/* Output Port  1 */
+#define OUT_PORT_1_NAME       received
+#define OUTPUT_1_WIDTH        1
+#define OUTPUT_DIMS_1_COL     1
+#define OUTPUT_1_DTYPE        int8_T
+#define OUTPUT_1_COMPLEX      COMPLEX_NO
+#define OUT_1_FRAME_BASED     FRAME_NO
+#define OUT_1_BUS_BASED       0
+#define OUT_1_BUS_NAME        
+#define OUT_1_DIMS            1-D
+#define OUT_1_ISSIGNED        1
+#define OUT_1_WORDLENGTH      8
+#define OUT_1_FIXPOINTSCALING 1
+#define OUT_1_FRACTIONLENGTH  3
+#define OUT_1_BIAS            0
+#define OUT_1_SLOPE           0.125
 
 #define NPARAMS               2
 /* Parameter 0 */
@@ -112,6 +128,7 @@ extern void drone_tcp_recv_Start_wrapper(void **pW,
 			const int32_T *para_port, const int_T p_width1);
 extern void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
@@ -213,6 +230,10 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetOutputPortFrameData(S, 0, OUT_0_FRAME_BASED);
     ssSetOutputPortDataType(S, 0, SS_INT32);
     ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
+    /* Output Port 1 */
+    ssSetOutputPortWidth(S, 1, OUTPUT_1_WIDTH);
+    ssSetOutputPortDataType(S, 1, SS_INT8);
+    ssSetOutputPortComplexSignal(S, 1, OUTPUT_1_COMPLEX);
     ssSetNumPWork(S, 1);
 
     ssSetNumSampleTimes(S, 1);
@@ -300,12 +321,13 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     void **pW = ssGetPWork(S);
     const int32_T *u0 = (int32_T *) ssGetInputPortRealSignal(S, 0);
     int32_T *y0 = (int32_T *) ssGetOutputPortRealSignal(S, 0);
+    int8_T *received = (int8_T *) ssGetOutputPortRealSignal(S, 1);
     const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
     const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
     const uint8_T *para_addr = (const uint8_T *) mxGetData(PARAM_DEF0(S));
     const int32_T *para_port = (const int32_T *) mxGetData(PARAM_DEF1(S));
     
-    drone_tcp_recv_Outputs_wrapper(u0, y0, pW, para_addr, p_width0, para_port, p_width1);
+    drone_tcp_recv_Outputs_wrapper(u0, y0, received, pW, para_addr, p_width0, para_port, p_width1);
 
 }
 

@@ -15,6 +15,8 @@
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <time.h>
+
 #pragma comment(lib, "ws2_32.lib")
 
 #include <simstruc.h>
@@ -87,8 +89,8 @@ void drone_tcp_recv_Start_wrapper(void **pW,
         return;
     }
     // set timeout
-    int recvTimeout = 1 * 3000; // 1s
-    int sendTimeout = 1 * 10000; // 1s
+    int recvTimeout = 1 * 3000;  // ms
+    int sendTimeout = 1 * 10000; // ms
     setsockopt(*pSock, SOL_SOCKET, SO_RCVTIMEO, (char *)&recvTimeout, sizeof(int));
     setsockopt(*pSock, SOL_SOCKET, SO_SNDTIMEO, (char *)&sendTimeout, sizeof(int));
 
@@ -129,12 +131,21 @@ void drone_tcp_recv_Start_wrapper(void **pW,
  */
 void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
 			int32_T *y0,
+			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-// define struct
+time_t t;
+    struct tm *p;
+    time(&t);
+    p = localtime(&t);
+    ssPrintf("[tcp_recv] real time: %02d:%02d:%02d\n", p->tm_hour, p->tm_min, p->tm_sec);    
+
+    *received = 1;    
+
+    // define struct
     typedef struct {
         int32_T x;
         int32_T y;
@@ -162,6 +173,8 @@ void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
     iResult = recv(*pSock, (char*)&recv_buf, POSTURE_SIZE, 0);
     if (iResult == -1) {
         ssPrintf("[tcp_recv] Error at socket: %d\n", WSAGetLastError());
+        *received = 0;
+        return;
     }
     ssPrintf("[tcp_recv] recv bytes %d\n", iResult);
     ssPrintf("[tcp_recv] recv posture x = %d, y = %d, z = %d\n\n", recv_buf.x, recv_buf.y, recv_buf.z);
