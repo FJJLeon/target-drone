@@ -18,6 +18,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include <simstruc.h>
+#include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
 #define y_width 12
@@ -47,12 +48,12 @@ void drone_tcp_send_Start_wrapper(void **pW,
     WSADATA wsadata;
     iResult = WSAStartup(MAKEWORD(2, 2), &wsadata);
     if (iResult != 0) {
-        ssPrintf("WSAStartip failed: %d\n", iResult);
+        LOG(ERROR, "WSAStartip failed: %d\n", iResult);
         return;
     }
     // check version
     if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2) {
-        ssPrintf("socket version not match!\n");
+        LOG(ERROR, "socket version not match!\n");
         WSACleanup();
     }
     // store SOCKET object into pWork
@@ -69,11 +70,11 @@ void drone_tcp_send_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    ssPrintf("server info %s:%s\n", serverAddr, serverPort);
+    LOG(DEBUG, "send server info %s:%s\n", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
-        ssPrintf("getaddrinfo failed: %d\n", iResult);
+        LOG(ERROR, "getaddrinfo failed: %d\n", iResult);
         WSACleanup();
         return;
     }
@@ -81,7 +82,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     ptr = result;
     *pSock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (*pSock == INVALID_SOCKET) {
-        ssPrintf("Error at socket(): %ld\n", WSAGetLastError());
+        LOG(ERROR, "Error at socket(): %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
         return;
@@ -97,15 +98,15 @@ void drone_tcp_send_Start_wrapper(void **pW,
     if (iResult == SOCKET_ERROR) {
         closesocket(*pSock);
         *pSock = INVALID_SOCKET;
-        ssPrintf("socket connect FAILED!\n");
+        LOG(ERROR, "send socket connect FAILED!\n");
     }
     else {
-        ssPrintf("socket connect SUCCESS!\n");
+        LOG(DEBUG, "send socket connect SUCCESS!");
     }
     
     freeaddrinfo(result);
     if (*pSock == INVALID_SOCKET) {
-        ssPrintf("Unable to connect to server!\n");
+        LOG(ERROR, "Unable to connect to server!\n");
         WSACleanup();
         return;
     }
@@ -120,7 +121,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     Role send_role = {666, 1};
     iResult = send(*pSock, (char *)&send_role, ROLE_SIZE, 0);
     if (iResult == -1) {
-        ssPrintf("[tcp_send] send role fail: %d\n", WSAGetLastError());
+        LOG(ERROR, "send role fail: %d\n", WSAGetLastError());
     }
 /* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
 }
@@ -136,25 +137,8 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 			const int32_T *para_port, const int_T p_width1)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-// define struct
-    typedef struct {
-        int32_T x;
-        int32_T y;
-        int32_T z;
-        int32_T u;
-        int32_T v;
-        int32_T w;
-        int32_T vx;
-        int32_T vy;
-        int32_T vz;
-        int32_T vu;
-        int32_T vv;
-        int32_T vw;
-    } Posture;
-    const int POSTURE_SIZE = sizeof(Posture);
-    中文变量 = 1;
-    if (*received == 0) {
-        ssPrintf("[tcp_send] not received, not send\n");
+if (*received == 0) {
+        LOG(DEBUG, "no receive, no send");
         return;
     }
 
@@ -164,29 +148,19 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 
     // build posture
     // Posture buffer = {u0[0], u0[1], u0[2], u0[3], u0[4], u0[5]};
-    
     Posture send_buf;
     memcpy((char *)&send_buf, u0, POSTURE_SIZE);
-    ssPrintf("[tcp_send] will send x = %d, y = %d, z = %d\n", send_buf.x, send_buf.y, send_buf.z);
+    LOG(DEBUG, "will send x = %d, y = %d, z = %d", send_buf.x, send_buf.y, send_buf.z);
     // send by socket
     iResult = send(*pSock, (char *)&send_buf, POSTURE_SIZE, 0);
-    ssPrintf("[tcp_send] send bytes: %d\n\n", iResult);
+   LOG(DEBUG, "send bytes: %d", iResult);
     if (iResult == -1) {
-        ssPrintf("[tcp_send] Error at socket : %ld\n", WSAGetLastError());
+        LOG(ERROR, "Error at socket : %ld\n", WSAGetLastError());
     }
 
     // output
     memcpy(y0, (char *)&send_buf, POSTURE_SIZE);
-    ssPrintf("-------------------------\n");
-
-/*
-    y0[0] = recv_buf.x;
-    y0[1] = recv_buf.y;
-    y0[2] = recv_buf.z;
-    y0[3] = recv_buf.u;
-    y0[4] = recv_buf.v;
-    y0[5] = recv_buf.w;
-*/
+    LOG(DEBUG, "------------ONE ROUND DONE----------");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Tue Apr 06 20:34:42 2021
+ * Created: Thu Apr 15 19:02:28 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -104,12 +104,12 @@
 #define CONT_STATES_IC        [0]
 
 #define SFUNWIZ_GENERATE_TLC  1
-#define SOURCEFILES           "__SFB__D:\MATLAB\R2021a\sys\lcc64\lcc64\lib64\ws2_32.lib"
+#define SOURCEFILES           "__SFB__D:\MATLAB\R2021a\sys\lcc64\lcc64\lib64\ws2_32.lib__SFB__drone_util.c__SFB__"
 #define PANELINDEX            N/A
 #define USE_SIMSTRUCT         0
 #define SHOW_COMPILE_STEPS    0
 #define CREATE_DEBUG_MEXFILE  0
-#define SAVE_CODE_ONLY        0
+#define SAVE_CODE_ONLY        1
 #define SFUNWIZ_REVISION      3.0
 /* %%%-SFUNWIZ_defines_Changes_END --- EDIT HERE TO _BEGIN */
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/

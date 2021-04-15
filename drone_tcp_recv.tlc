@@ -1,5 +1,5 @@
 %% File : drone_tcp_recv.tlc
-%% Created : Wed Apr 07 19:17:51 2021
+%% Created : Thu Apr 15 19:02:31 2021
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -44,8 +44,7 @@
     SFB_EXTERN_C void drone_tcp_recv_Start_wrapper_accel(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
-    SFB_EXTERN_C void drone_tcp_recv_Outputs_wrapper_accel(const int32_T *u0,
-			int32_T *y0,
+    SFB_EXTERN_C void drone_tcp_recv_Outputs_wrapper_accel(int32_T *out,
 			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
@@ -72,8 +71,7 @@
     extern void drone_tcp_recv_Start_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
-    extern void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
-			int32_T *y0,
+    extern void drone_tcp_recv_Outputs_wrapper(int32_T *out,
 			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
@@ -88,14 +86,12 @@
 			para_addr, p_width0,
 			para_port, p_width1);
     }
-    void drone_tcp_recv_Outputs_wrapper_accel(const int32_T *u0,
-			int32_T *y0,
+    void drone_tcp_recv_Outputs_wrapper_accel(int32_T *out,
 			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1){
-    drone_tcp_recv_Outputs_wrapper(u0,
-			y0,
+    drone_tcp_recv_Outputs_wrapper(out,
 			received,
 			pW,
 			para_addr, p_width0,
@@ -125,8 +121,7 @@
 			const uint8_T *para_addr, const int_T p_width0,
 			const int32_T *para_port, const int_T p_width1);
 
-    extern void drone_tcp_recv_Outputs_wrapper(const int32_T *u0,
-			int32_T *y0,
+    extern void drone_tcp_recv_Outputs_wrapper(int32_T *out,
 			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
@@ -182,7 +177,6 @@
 %function Outputs(block, system) Output
   %%
   %assign ppw = LibBlockDWorkAddr(PWORK, "", "", 0)
-  %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   %assign nelements1 = LibBlockParameterSize(P1)
@@ -201,9 +195,9 @@
   %endif
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    drone_tcp_recv_Outputs_wrapper_accel(%<pu0>, %<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
+    drone_tcp_recv_Outputs_wrapper_accel(%<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
   %else
-    drone_tcp_recv_Outputs_wrapper(%<pu0>, %<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
+    drone_tcp_recv_Outputs_wrapper(%<py0>, %<py1>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>);
   %endif
 
   %%
