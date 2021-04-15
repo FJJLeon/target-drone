@@ -38,7 +38,7 @@ void drone_trackgen_Outputs_wrapper(const int32_T *in,
 			int32_T *out)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-    LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
+LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     
     // transmission use integer (double x1000 truncation) 
     double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;

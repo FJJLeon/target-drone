@@ -26,11 +26,19 @@ void mylog(const char *func, const char *file, const int line,
     }
 
     // 获取本地时间
-    time_t loacl_time;
-    char time_str[128];
-    time(&loacl_time);
-    // strftime(time_str, sizeof(time_str), "[%Y.%m.%d %X]", localtime(&loacl_time));
-    strftime(time_str, sizeof(time_str), "%X", localtime(&loacl_time));
+//     time_t t;
+//     struct tm *p;
+//     time(&t);
+//     p = localtime(&t);
+//     char time_str[18];
+//     sprintf(time_str, "%04d-%02d-%02d %02d:%02d:%02d", 1900+p->tm_year, p->tm_mon, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec);
+    time_t timer;
+    char time_str[26];
+    struct tm* tm_info;
+    timer = time(NULL);
+    tm_info = localtime(&timer);
+
+    strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", tm_info);
     
     // 日志内容格式转换
     va_list ap;
