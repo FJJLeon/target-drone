@@ -16,7 +16,6 @@
 #include <math.h>
 #define _USE_MATH_DEFINES
 
-#include <simstruc.h>
 #include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
@@ -50,7 +49,8 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     out[0] = (int32_T) (100 * cos(theta) * 1000);
     out[1] = (int32_T) (100 * sin(theta) * 1000);
     out[2] = fabs(theta) < 0.001 ? in[2] + 1000: in[2];
-    if (abs(theta) < 0.001) {
+    out[5] = (int)(theta - M_PI) * 1000;
+    if (fabs(theta) < 0.001) {
         LOG(DEBUG, " z climb, theta = %f, fabs(theta) = %f, z chaneg from %d to %d\n", theta, fabs(theta), in[2], out[2]);
     }
     LOG(DEBUG, "output x = %d y = %d z = %d\n", out[0], out[1], out[2]);
