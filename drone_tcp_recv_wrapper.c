@@ -149,7 +149,8 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     // recv by socket
     iResult = recv(*pSock, (char*)&recv_buf, RECVPACKAGE_SIZE, 0);
     if (iResult == -1) {
-        LOG(WARNING, "Error at socket: %ld\n", WSAGetLastError());
+        LOG(WARNING, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
+        // TODO, if socket not connect in Start, here error code = 10038 and no timeout wait
         *received = 0;
         return;
     }

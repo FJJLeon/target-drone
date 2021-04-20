@@ -41,15 +41,16 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     
     // transmission use integer (double x1000 truncation) 
     double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;
-    double theta = atan2(y_in, x_in) - M_PI / 12;
+    double theta = atan2(y_in, x_in) - M_PI / 90;
     LOG(DEBUG, "new theta = %f radian = %f angle", theta, theta / M_PI * 180);
 
     // 虽然这里的输入有 17 个字段，后 5 个字段为操作，在靶机中用不到
     memcpy(out, in, sizeof(in[0]) * 12);
-    out[0] = (int32_T) (100 * cos(theta) * 1000);
-    out[1] = (int32_T) (100 * sin(theta) * 1000);
-    out[2] = fabs(theta) < 0.001 ? in[2] + 1000: in[2];
-    out[5] = (int)(theta - M_PI) * 1000;
+    out[0] = (int32_T) (400 * cos(theta) * 1000);
+    out[1] = (int32_T) (400 * sin(theta) * 1000);
+    //out[2] = fabs(theta) < 0.001 ? in[2] + 1000: in[2];
+    out[2] = in[2] + 100;
+    out[5] = (int)((theta - M_PI) * 1000);
     if (fabs(theta) < 0.001) {
         LOG(DEBUG, " z climb, theta = %f, fabs(theta) = %f, z chaneg from %d to %d\n", theta, fabs(theta), in[2], out[2]);
     }

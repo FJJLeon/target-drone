@@ -138,7 +138,7 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 if (*received == 0) {
-        LOG(DEBUG, "no receive, no send");
+        LOG(DEBUG, "no receive, no send @%d", para_port[0]);
         return;
     }
 
@@ -155,7 +155,7 @@ if (*received == 0) {
     iResult = send(*pSock, (char *)&send_buf, POSTURE_SIZE, 0);
    LOG(DEBUG, "send bytes: %d", iResult);
     if (iResult == -1) {
-        LOG(ERROR, "Error at socket : %ld\n", WSAGetLastError());
+        LOG(ERROR, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
     }
 
     // output
