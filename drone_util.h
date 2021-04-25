@@ -1,7 +1,9 @@
 #ifndef DRONE_UTIL_H
 #define DRONE_UTIL_H
 
-#include "stdarg.h"
+#include <stdarg.h>
+#include <time.h>
+
 #include <simstruc.h>
 
 // 发送与接收的包结构体
@@ -11,13 +13,13 @@ typedef struct {
     int32_T x; // 位置
     int32_T y;
     int32_T z;
-    int32_T u;
+    int32_T u; // 姿态\朝向  
     int32_T v;
     int32_T w;
     int32_T vx; // 速度
     int32_T vy;
     int32_T vz;
-    int32_T vu;
+    int32_T vu; // 角速度
     int32_T vv;
     int32_T vw;
 } Posture;
@@ -28,7 +30,7 @@ typedef struct {
     int32_T pitch;      // 俯仰
     int32_T roll;       // 翻滚
     int32_T yaw;        // 偏航
-    int32_T accelerate; // 油门
+    int32_T accelerate; // 油门，throttle(节流阀)
     uint32_T weapon;    // 武器
 } Operation;
 extern const int OPERATION_SIZE;
