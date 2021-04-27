@@ -30,10 +30,12 @@ typedef struct {
     int32_T pitch;      // 俯仰
     int32_T roll;       // 翻滚
     int32_T yaw;        // 偏航
-    int32_T accelerate; // 油门，throttle(节流阀)
+    int32_T accelerate; // 油门，throttle(节流阀
     uint32_T weapon;    // 武器
+    int32_T steps;      // 步距
 } Operation;
 extern const int OPERATION_SIZE;
+
 // 接收包
 typedef struct {
     Posture post;

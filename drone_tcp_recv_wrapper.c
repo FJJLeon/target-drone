@@ -22,7 +22,7 @@
 #include <simstruc.h>
 #include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
-#define y_width 17
+#define y_width 18
 
 /*
  * Create external references here.  

@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Mon Apr 26 01:27:54 2021
+ * Created: Tue Apr 27 20:41:25 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -37,7 +37,7 @@
 /* Input Port  0 */
 #define IN_PORT_0_NAME        in
 #define INPUT_0_WIDTH         1
-#define INPUT_DIMS_0_COL      17
+#define INPUT_DIMS_0_COL      18
 #define INPUT_0_DTYPE         int32_T
 #define INPUT_0_COMPLEX       COMPLEX_NO
 #define IN_0_FRAME_BASED      FRAME_NO
