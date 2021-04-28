@@ -70,7 +70,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, "send server info %s:%s\n", serverAddr, serverPort);
+    LOG(DEBUG, "send server info %s:%s", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
@@ -155,12 +155,12 @@ if (*received == 0) {
     iResult = send(*pSock, (char *)&send_buf, POSTURE_SIZE, 0);
    LOG(DEBUG, "send bytes: %d", iResult);
     if (iResult == -1) {
-        LOG(ERROR, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
+        LOG(ERROR, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
     }
 
     // output
     memcpy(y0, (char *)&send_buf, POSTURE_SIZE);
-    LOG(DEBUG, "------------ONE ROUND DONE----------");
+    LOG(DEBUG, "------------ONE ROUND DONE----------\n");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

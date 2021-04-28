@@ -44,10 +44,11 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     /*
     // transmission use integer (double x1000 truncation) 
     double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;
-    double theta = atan2(y_in, x_in) - M_PI / 120;
+    double theta = atan2(y_in, x_in) - M_PI / 120 * in[17];
     LOG(DEBUG, "new theta = %f radian = %f angle", theta, theta / M_PI * 180);
 
     // 虽然这里的输入有 17 个字段，后 5 个字段为操作，在靶机中用不到
+    // 好吧现在多了一个 steps，表示走过的单位步数，要用
     memcpy(out, in, sizeof(in[0]) * 12);
     out[0] = (int32_T) (200 * cos(theta) * 1000);
     out[1] = (int32_T) (200 * sin(theta) * 1000);
@@ -55,19 +56,12 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     out[2] = in[2] + 100;
     out[5] = (int)((theta - M_PI) * 1000);
     if (fabs(theta) < 0.001) {
-        LOG(DEBUG, " z climb, theta = %f, fabs(theta) = %f, z chaneg from %d to %d\n", theta, fabs(theta), in[2], out[2]);
+        LOG(DEBUG, " z climb, theta = %f, fabs(theta) = %f, z chaneg from %d to %d", theta, fabs(theta), in[2], out[2]);
     }
-    LOG(DEBUG, "output x = %d y = %d z = %d\n", out[0], out[1], out[2]);
+    LOG(DEBUG, "output x = %d y = %d z = %d", out[0], out[1], out[2]);
     */
-    /*
-    unsigned char *p;
-    p = (unsigned char *)&out[0];
-    ssPrintf("x = %f, (HEX in BE) %02X %02X %02X %02X %02X %02X %02X %02X\n",out[0],p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
-    p = (unsigned char *)&out[1];
-    ssPrintf("y = %f, (HEX in BE) %02X %02X %02X %02X %02X %02X %02X %02X\n",out[1],p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
-    p = (unsigned char *)&out[2];
-    ssPrintf("z = %f, (HEX in BE) %02X %02X %02X %02X %02X %02X %02X %02X\n",out[2],p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
-    */
+    
+    LOG(DEBUG, "\n");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

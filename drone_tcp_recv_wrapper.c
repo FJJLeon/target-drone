@@ -71,7 +71,7 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, "server info %s:%s\n", serverAddr, serverPort);
+    LOG(DEBUG, "server info %s:%s", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
@@ -149,7 +149,7 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     // recv by socket
     iResult = recv(*pSock, (char*)&recv_buf, RECVPACKAGE_SIZE, 0);
     if (iResult == -1) {
-        LOG(WARNING, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
+        LOG(WARNING, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
         // TODO, if socket not connect in Start, here error code = 10038 and no timeout wait
         *received = 0;
         return;
@@ -158,6 +158,7 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     LOG(DEBUG, "recv posture x = %d, y = %d, z = %d", recv_buf.post.x, recv_buf.post.y, recv_buf.post.z);
     // output
     memcpy(out, (char*)&recv_buf, RECVPACKAGE_SIZE);
+    LOG(DEBUG, "\n");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
