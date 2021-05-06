@@ -19,7 +19,7 @@
 #include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
-#define y_width 12
+#define y_width 13
 
 /*
  * Create external references here.  
@@ -39,7 +39,7 @@ void drone_trackgen_Outputs_wrapper(const int32_T *in,
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     
-     memcpy(out, in, sizeof(in[0]) * 12);
+     memcpy(out, in, POSTURE_SIZE);
 
     /*
     // transmission use integer (double x1000 truncation) 
@@ -49,7 +49,7 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
 
     // 虽然这里的输入有 17 个字段，后 5 个字段为操作，在靶机中用不到
     // 好吧现在多了一个 steps，表示走过的单位步数，要用
-    memcpy(out, in, sizeof(in[0]) * 12);
+    memcpy(out, in, POSTURE_SIZE);
     out[0] = (int32_T) (200 * cos(theta) * 1000);
     out[1] = (int32_T) (200 * sin(theta) * 1000);
     //out[2] = fabs(theta) < 0.001 ? in[2] + 1000: in[2];
@@ -60,8 +60,6 @@ LOG(DEBUG, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
     }
     LOG(DEBUG, "output x = %d y = %d z = %d", out[0], out[1], out[2]);
     */
-    
-    LOG(DEBUG, "\n");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

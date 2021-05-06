@@ -6,6 +6,8 @@ const int OPERATION_SIZE = sizeof(Operation);
 
 const int RECVPACKAGE_SIZE = sizeof(RecvPackage);
 
+const int ROLE_SIZE = sizeof(Role);
+
 void mylog(const char *func, const char *file, const int line,
           const int level, const char *format, ...)
 {

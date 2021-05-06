@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Wed Apr 28 21:38:22 2021
+ * Created: Thu May 06 13:36:24 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -39,7 +39,7 @@
 /* Output Port  0 */
 #define OUT_PORT_0_NAME       out
 #define OUTPUT_0_WIDTH        1
-#define OUTPUT_DIMS_0_COL     18
+#define OUTPUT_DIMS_0_COL     19
 #define OUTPUT_0_DTYPE        int32_T
 #define OUTPUT_0_COMPLEX      COMPLEX_NO
 #define OUT_0_FRAME_BASED     FRAME_NO
@@ -69,7 +69,7 @@
 #define OUT_1_BIAS            0
 #define OUT_1_SLOPE           0.125
 
-#define NPARAMS               2
+#define NPARAMS               5
 /* Parameter 0 */
 #define PARAMETER_0_NAME      para_addr
 #define PARAMETER_0_DTYPE     uint8_T
@@ -78,6 +78,18 @@
 #define PARAMETER_1_NAME      para_port
 #define PARAMETER_1_DTYPE     int32_T
 #define PARAMETER_1_COMPLEX   COMPLEX_NO
+/* Parameter 2 */
+#define PARAMETER_2_NAME      para_role_type
+#define PARAMETER_2_DTYPE     int32_T
+#define PARAMETER_2_COMPLEX   COMPLEX_NO
+/* Parameter 3 */
+#define PARAMETER_3_NAME      para_role_tag
+#define PARAMETER_3_DTYPE     int32_T
+#define PARAMETER_3_COMPLEX   COMPLEX_NO
+/* Parameter 4 */
+#define PARAMETER_4_NAME      para_role_id
+#define PARAMETER_4_DTYPE     int32_T
+#define PARAMETER_4_COMPLEX   COMPLEX_NO
 
 #define SAMPLE_TIME_0         100
 #define NUM_DISC_STATES       0
@@ -91,7 +103,7 @@
 #define USE_SIMSTRUCT         0
 #define SHOW_COMPILE_STEPS    0
 #define CREATE_DEBUG_MEXFILE  0
-#define SAVE_CODE_ONLY        1
+#define SAVE_CODE_ONLY        0
 #define SFUNWIZ_REVISION      3.0
 /* %%%-SFUNWIZ_defines_Changes_END --- EDIT HERE TO _BEGIN */
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
@@ -99,6 +111,9 @@
 
 #define PARAM_DEF0(S) ssGetSFcnParam(S, 0)
 #define PARAM_DEF1(S) ssGetSFcnParam(S, 1)
+#define PARAM_DEF2(S) ssGetSFcnParam(S, 2)
+#define PARAM_DEF3(S) ssGetSFcnParam(S, 3)
+#define PARAM_DEF4(S) ssGetSFcnParam(S, 4)
 
 #define IS_PARAM_INT32(pVal) (mxIsNumeric(pVal) && !mxIsLogical(pVal) &&\
 !mxIsEmpty(pVal) && !mxIsSparse(pVal) && !mxIsComplex(pVal) && mxIsInt32(pVal))
@@ -108,15 +123,24 @@
 
 extern void drone_tcp_recv_Start_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1);
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4);
 extern void drone_tcp_recv_Outputs_wrapper(int32_T *out,
 			int8_T *received,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1);
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4);
 extern void drone_tcp_recv_Terminate_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1);
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4);
 /*====================*
  * S-function methods *
  *====================*/
@@ -146,6 +170,33 @@ static void mdlCheckParameters(SimStruct *S)
         if (!IS_PARAM_INT32(pVal1)) {
             invalidParam = true;
             paramIndex = 1;
+            goto EXIT_POINT;
+        }
+    }
+
+    {
+        const mxArray *pVal2 = ssGetSFcnParam(S, 2);
+        if (!IS_PARAM_INT32(pVal2)) {
+            invalidParam = true;
+            paramIndex = 2;
+            goto EXIT_POINT;
+        }
+    }
+
+    {
+        const mxArray *pVal3 = ssGetSFcnParam(S, 3);
+        if (!IS_PARAM_INT32(pVal3)) {
+            invalidParam = true;
+            paramIndex = 3;
+            goto EXIT_POINT;
+        }
+    }
+
+    {
+        const mxArray *pVal4 = ssGetSFcnParam(S, 4);
+        if (!IS_PARAM_INT32(pVal4)) {
+            invalidParam = true;
+            paramIndex = 4;
             goto EXIT_POINT;
         }
     }
@@ -250,7 +301,7 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
 static void mdlSetWorkWidths(SimStruct *S)
 {
 
-    const char_T *rtParamNames[] = {"P1","P2"};
+    const char_T *rtParamNames[] = {"P1","P2","P3","P4","P5"};
     ssRegAllTunableParamsAsRunTimeParams(S, rtParamNames);
 
 }
@@ -270,10 +321,16 @@ static void mdlStart(SimStruct *S)
     void **pW = ssGetPWork(S);
     const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
     const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
+    const int_T   p_width2  = mxGetNumberOfElements(PARAM_DEF2(S));
+    const int_T   p_width3  = mxGetNumberOfElements(PARAM_DEF3(S));
+    const int_T   p_width4  = mxGetNumberOfElements(PARAM_DEF4(S));
     const uint8_T *para_addr = (const uint8_T *) mxGetData(PARAM_DEF0(S));
     const int32_T *para_port = (const int32_T *) mxGetData(PARAM_DEF1(S));
+    const int32_T *para_role_type = (const int32_T *) mxGetData(PARAM_DEF2(S));
+    const int32_T *para_role_tag = (const int32_T *) mxGetData(PARAM_DEF3(S));
+    const int32_T *para_role_id = (const int32_T *) mxGetData(PARAM_DEF4(S));
     
-    drone_tcp_recv_Start_wrapper(pW, para_addr, p_width0, para_port, p_width1);
+    drone_tcp_recv_Start_wrapper(pW, para_addr, p_width0, para_port, p_width1, para_role_type, p_width2, para_role_tag, p_width3, para_role_id, p_width4);
 }
 #endif /*  MDL_START */
 
@@ -287,10 +344,16 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     int8_T *received = (int8_T *) ssGetOutputPortRealSignal(S, 1);
     const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
     const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
+    const int_T   p_width2  = mxGetNumberOfElements(PARAM_DEF2(S));
+    const int_T   p_width3  = mxGetNumberOfElements(PARAM_DEF3(S));
+    const int_T   p_width4  = mxGetNumberOfElements(PARAM_DEF4(S));
     const uint8_T *para_addr = (const uint8_T *) mxGetData(PARAM_DEF0(S));
     const int32_T *para_port = (const int32_T *) mxGetData(PARAM_DEF1(S));
+    const int32_T *para_role_type = (const int32_T *) mxGetData(PARAM_DEF2(S));
+    const int32_T *para_role_tag = (const int32_T *) mxGetData(PARAM_DEF3(S));
+    const int32_T *para_role_id = (const int32_T *) mxGetData(PARAM_DEF4(S));
     
-    drone_tcp_recv_Outputs_wrapper(out, received, pW, para_addr, p_width0, para_port, p_width1);
+    drone_tcp_recv_Outputs_wrapper(out, received, pW, para_addr, p_width0, para_port, p_width1, para_role_type, p_width2, para_role_tag, p_width3, para_role_id, p_width4);
 
 }
 
@@ -305,10 +368,16 @@ static void mdlTerminate(SimStruct *S)
     void **pW = ssGetPWork(S);
     const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
     const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
+    const int_T   p_width2  = mxGetNumberOfElements(PARAM_DEF2(S));
+    const int_T   p_width3  = mxGetNumberOfElements(PARAM_DEF3(S));
+    const int_T   p_width4  = mxGetNumberOfElements(PARAM_DEF4(S));
     const uint8_T *para_addr = (const uint8_T *) mxGetData(PARAM_DEF0(S));
     const int32_T *para_port = (const int32_T *) mxGetData(PARAM_DEF1(S));
+    const int32_T *para_role_type = (const int32_T *) mxGetData(PARAM_DEF2(S));
+    const int32_T *para_role_tag = (const int32_T *) mxGetData(PARAM_DEF3(S));
+    const int32_T *para_role_id = (const int32_T *) mxGetData(PARAM_DEF4(S));
     
-    drone_tcp_recv_Terminate_wrapper(pW, para_addr, p_width0, para_port, p_width1);
+    drone_tcp_recv_Terminate_wrapper(pW, para_addr, p_width0, para_port, p_width1, para_role_type, p_width2, para_role_tag, p_width3, para_role_id, p_width4);
 
 }
 

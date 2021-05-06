@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Wed Apr 28 21:35:35 2021
+ * Created: Thu May 06 13:31:42 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -37,7 +37,7 @@
 /* Input Port  0 */
 #define IN_PORT_0_NAME        in
 #define INPUT_0_WIDTH         1
-#define INPUT_DIMS_0_COL      18
+#define INPUT_DIMS_0_COL      19
 #define INPUT_0_DTYPE         int32_T
 #define INPUT_0_COMPLEX       COMPLEX_NO
 #define IN_0_FRAME_BASED      FRAME_NO
@@ -56,7 +56,7 @@
 /* Output Port  0 */
 #define OUT_PORT_0_NAME       out
 #define OUTPUT_0_WIDTH        1
-#define OUTPUT_DIMS_0_COL     12
+#define OUTPUT_DIMS_0_COL     13
 #define OUTPUT_0_DTYPE        int32_T
 #define OUTPUT_0_COMPLEX      COMPLEX_NO
 #define OUT_0_FRAME_BASED     FRAME_NO
@@ -84,7 +84,7 @@
 #define USE_SIMSTRUCT         0
 #define SHOW_COMPILE_STEPS    0
 #define CREATE_DEBUG_MEXFILE  0
-#define SAVE_CODE_ONLY        1
+#define SAVE_CODE_ONLY        0
 #define SFUNWIZ_REVISION      3.0
 /* %%%-SFUNWIZ_defines_Changes_END --- EDIT HERE TO _BEGIN */
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/

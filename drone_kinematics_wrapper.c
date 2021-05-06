@@ -18,7 +18,7 @@
 #include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
-#define y_width 12
+#define y_width 13
 
 /*
  * Create external references here.  
@@ -65,12 +65,12 @@ RecvPackage pkg;
     double w_y = pitch * unit_w * steps;
     double w_z = yaw   * unit_w * steps;
     
-    double d_fai   = (w_x * cos(psi) - w_y * sin(psi)) / cos(theta);
-    double d_theta = w_x * sin(psi) + w_y * cos(psi);
-    double d_psi   = w_z + tan(theta) * (w_x * cos(psi) - w_y * sin(psi));
-//     double d_fai = w_x;
-//     double d_theta = w_y;
-//     double d_psi = w_z;
+//     double d_fai   = (w_x * cos(psi) - w_y * sin(psi)) / cos(theta);
+//     double d_theta = w_x * sin(psi) + w_y * cos(psi);
+//     double d_psi   = w_z + tan(theta) * (w_x * cos(psi) - w_y * sin(psi));
+    double d_fai = w_x;
+    double d_theta = w_y;
+    double d_psi = w_z;
     
     double new_fai = fai + d_fai;
     double new_theta = theta + d_theta;

@@ -21,7 +21,7 @@
 #include <drone_util.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
-#define y_width 12
+#define y_width 13
 
 /*
  * Create external references here.  
@@ -37,7 +37,10 @@
  */
 void drone_tcp_send_Start_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1)
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
 // malloc pWork memory for socket
@@ -110,15 +113,8 @@ void drone_tcp_send_Start_wrapper(void **pW,
         WSACleanup();
         return;
     }
-
-    // role message send
-    typedef struct {
-        int32_T id;
-        int32_T type; // 0 for recv(posture from commu server to target drone client)
-                      // 1 for send (drone to commu server)
-    } Role;
-    const int ROLE_SIZE = sizeof(Role);
-    Role send_role = {666, 1};
+    
+    Role send_role = {para_role_type[0], para_role_tag[0], para_role_id[0], ROLE_DIR_SEND};
     iResult = send(*pSock, (char *)&send_role, ROLE_SIZE, 0);
     if (iResult == -1) {
         LOG(ERROR, "send role fail: %d\n", WSAGetLastError());
@@ -134,11 +130,14 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 			int32_T *y0,
 			void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1)
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 if (*received == 0) {
-        LOG(DEBUG, "no receive, no send @%d", para_port[0]);
+        LOG(DEBUG, "no receive, no send @%d\n", para_port[0]);
         return;
     }
 
@@ -170,7 +169,10 @@ if (*received == 0) {
  */
 void drone_tcp_send_Terminate_wrapper(void **pW,
 			const uint8_T *para_addr, const int_T p_width0,
-			const int32_T *para_port, const int_T p_width1)
+			const int32_T *para_port, const int_T p_width1,
+			const int32_T *para_role_type, const int_T p_width2,
+			const int32_T *para_role_tag, const int_T p_width3,
+			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Terminate_Changes_BEGIN --- EDIT HERE TO _END */
 // retrieve TCP Socket from pWork
