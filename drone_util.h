@@ -49,7 +49,7 @@ extern const int RECVPACKAGE_SIZE;
  * Role 会在该模块初始化时发给通讯告知这是 某个具体类型靶机\运动学模型的某个实例的收\发模块
  *
  * 靶机的 type 是 0
- * tag 表示靶机的具体类型，静止的靶机 static - 00
+ * tag 表示靶机的具体类型，静止的靶机 static - 01
  * id 是该具体类型靶机的 id，可供多实例使用
  *
  * 运动学模型机的 type 是 1
@@ -62,11 +62,11 @@ extern const int RECVPACKAGE_SIZE;
  * 
  * 静止靶机 1
 role_type = 0;
-role_tag = 00;
+role_tag = 01;
 role_id = 0001;
  * 静止靶机 2
 role_type = 0;
-role_tag = 00;
+role_tag = 01;
 role_id = 0002;
  * 运动学模型 1
 role_type = 1;
@@ -79,8 +79,8 @@ role_id = 1002;
 
  */
 typedef struct {
-    int32_T type; // 0 for drone, 1 for kine
-    int32_T tag;  // save for different kind drone
+    int32_T type; // 0 for target, 1 for kine
+    int32_T tag;  // save for different kind target
     int32_T id;   // instance id
     int32_T direction; // 0 for commu2model, 1 for model2commu
 } Role;
