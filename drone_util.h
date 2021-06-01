@@ -101,8 +101,8 @@ extern const int ROLE_SIZE;
 #define ERROR 2
 
 extern void mylog(const char *func, const char *file, const int line,
-          const int level, const char *format, ...);
+          const int level, const int tolog, const char *fn, const char *format, ...);
 
-#define LOG(level, format, ...) mylog(__func__, __FILE__, __LINE__, level, format, ##__VA_ARGS__)
+#define LOG(level, tolog, fn, format, ...) mylog(__func__, __FILE__, __LINE__, level, tolog, fn, format, ##__VA_ARGS__)
 
 #endif

@@ -44,7 +44,18 @@ void drone_tcp_recv_Start_wrapper(void **pW,
 			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
-// malloc pWork memory for socket
+// malloc pWork memory for filename      
+    char role_str[7];
+    sprintf(role_str, "%04d_%02d", para_role_id[0], para_role_tag[0]);
+    
+    char *dirname = "./logs";
+    pW[1] = malloc(strlen(dirname) + 1 + strlen(role_str) + 4);
+    char *fn = (char*) pW[1];
+    sprintf(fn, "%s/%s.txt", dirname, role_str);
+    ssPrintf("LOG FILE: %s\n", fn);
+    
+    
+    // malloc pWork memory for socket
     pW[0] = malloc(sizeof(SOCKET *));
     
     int iResult;
@@ -52,12 +63,12 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     WSADATA wsadata;
     iResult = WSAStartup(MAKEWORD(2, 2), &wsadata);
     if (iResult != 0) {
-        LOG(ERROR, "WSAStartip failed: %d\n", iResult);
+        LOG(ERROR, 1, fn, "WSAStartip failed: %d\n", iResult);
         return;
     }
     // check version
     if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2) {
-        LOG(ERROR, "socket version not match!\n");
+        LOG(ERROR, 1, fn, "socket version not match!\n");
         WSACleanup();
     }
     // store SOCKET object into pWork
@@ -74,11 +85,11 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, "server info %s:%s", serverAddr, serverPort);
+    LOG(DEBUG, 1, fn, "server info %s:%s", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
-        LOG(ERROR, "getaddrinfo failed: %d\n", iResult);
+        LOG(ERROR, 1, fn, "getaddrinfo failed: %d\n", iResult);
         WSACleanup();
         return;
     }
@@ -86,7 +97,7 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     ptr = result;
     *pSock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (*pSock == INVALID_SOCKET) {
-        LOG(ERROR, "Error at socket(): %ld\n", WSAGetLastError());
+        LOG(ERROR, 1, fn, "Error at socket(): %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
         return;
@@ -102,15 +113,15 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     if (iResult == SOCKET_ERROR) {
         closesocket(*pSock);
         *pSock = INVALID_SOCKET;
-        LOG(ERROR, "recv socket connect FAILED!\n");
+        LOG(ERROR, 1, fn, "recv socket connect FAILED!\n");
     }
     else {
-        LOG(DEBUG, "recv socket connect SUCCESS!\n");
+        LOG(DEBUG, 1, fn, "recv socket connect SUCCESS!\n");
     }
     
     freeaddrinfo(result);
     if (*pSock == INVALID_SOCKET) {
-        LOG(ERROR, "Unable to connect to server!\n");
+        LOG(ERROR, 1, fn, "Unable to connect to server!\n");
         WSACleanup();
         return;
     }
@@ -118,7 +129,7 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     Role recv_role = {para_role_type[0], para_role_tag[0], para_role_id[0], ROLE_DIR_RECV};
     iResult = send(*pSock, (char *)&recv_role, ROLE_SIZE, 0);
     if (iResult == -1) {
-        LOG(ERROR, "send role fail: %d\n", WSAGetLastError());
+        LOG(ERROR, 1, fn, "send role fail: %d\n", WSAGetLastError());
     }
 /* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
 }
@@ -141,6 +152,7 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     
     // retrieve TCP Socket from pWork
     SOCKET *pSock = (SOCKET *)pW[0];
+    const char *fn = (char *)pW[1];
     int iResult;
 
     // recv posture buffer
@@ -149,13 +161,13 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     // recv by socket
     iResult = recv(*pSock, (char*)&recv_buf, RECVPACKAGE_SIZE, 0);
     if (iResult == -1) {
-        LOG(WARNING, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
+        LOG(WARNING, 1, fn, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
         // TODO, if socket not connect in Start, here error code = 10038 and no timeout wait
         *received = 0;
         return;
     }
-    LOG(DEBUG, "recv bytes %d", iResult);
-    LOG(DEBUG, "recv posture x = %d, y = %d, z = %d", recv_buf.post.x, recv_buf.post.y, recv_buf.post.z);
+    LOG(DEBUG, 1, fn, "recv bytes %d", iResult);
+    LOG(DEBUG, 1, fn, "recv posture x = %d, y = %d, z = %d", recv_buf.post.x, recv_buf.post.y, recv_buf.post.z);
     // output
     memcpy(out, (char*)&recv_buf, RECVPACKAGE_SIZE);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */

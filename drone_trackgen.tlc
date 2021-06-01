@@ -1,5 +1,5 @@
 %% File : drone_trackgen.tlc
-%% Created : Thu May 06 13:31:42 2021
+%% Created : Tue Jun 01 22:28:04 2021
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -41,8 +41,16 @@
     #else
     #define SFB_EXTERN_C extern
     #endif
+    SFB_EXTERN_C void drone_trackgen_Start_wrapper_accel(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
     SFB_EXTERN_C void drone_trackgen_Outputs_wrapper_accel(const int32_T *in,
-			int32_T *out);
+			int32_T *out,
+			void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -59,14 +67,41 @@
     #include "%<hFileName>.h"
     
 
-    extern void drone_trackgen_Start_wrapper(void);
+    extern void drone_trackgen_Start_wrapper(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
     extern void drone_trackgen_Outputs_wrapper(const int32_T *in,
-			int32_T *out);
-    extern void drone_trackgen_Terminate_wrapper(void);
+			int32_T *out,
+			void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
+    extern void drone_trackgen_Terminate_wrapper(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
+    void drone_trackgen_Start_wrapper_accel(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2){
+    drone_trackgen_Start_wrapper(pW,
+			para_role_type, p_width0,
+			para_role_tag, p_width1,
+			para_role_id, p_width2);
+    }
     void drone_trackgen_Outputs_wrapper_accel(const int32_T *in,
-			int32_T *out){
+			int32_T *out,
+			void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2){
     drone_trackgen_Outputs_wrapper(in,
-			out);
+			out,
+			pW,
+			para_role_type, p_width0,
+			para_role_tag, p_width1,
+			para_role_id, p_width2);
     }
 
     %closefile cFile
@@ -81,12 +116,22 @@
     extern "C" {
     #endif
 
-    extern void drone_trackgen_Start_wrapper(void);
+    extern void drone_trackgen_Start_wrapper(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
 
     extern void drone_trackgen_Outputs_wrapper(const int32_T *in,
-			int32_T *out);
+			int32_T *out,
+			void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
 
-    extern void drone_trackgen_Terminate_wrapper(void);
+    extern void drone_trackgen_Terminate_wrapper(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
 
     #ifdef __cplusplus
     }
@@ -99,6 +144,40 @@
 %endfunction
 
 
+%% Function: Start ============================================================
+%%
+%function Start(block, system) Output
+   /* %<Type> Block: %<Name> */
+  %assign ppw = LibBlockDWorkAddr(PWORK, "", "", 0)
+  %assign nelements1 = LibBlockParameterSize(P1)
+  %assign param_width1 = nelements1[0] * nelements1[1]
+  %if (param_width1) > 1
+    %assign pp1 = LibBlockMatrixParameterBaseAddr(P1)
+  %else
+    %assign pp1 = LibBlockParameterAddr(P1, "", "", 0)
+  %endif
+  %assign nelements2 = LibBlockParameterSize(P2)
+  %assign param_width2 = nelements2[0] * nelements2[1]
+  %if (param_width2) > 1
+    %assign pp2 = LibBlockMatrixParameterBaseAddr(P2)
+  %else
+    %assign pp2 = LibBlockParameterAddr(P2, "", "", 0)
+  %endif
+  %assign nelements3 = LibBlockParameterSize(P3)
+  %assign param_width3 = nelements3[0] * nelements3[1]
+  %if (param_width3) > 1
+    %assign pp3 = LibBlockMatrixParameterBaseAddr(P3)
+  %else
+    %assign pp3 = LibBlockParameterAddr(P3, "", "", 0)
+  %endif
+  
+  %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
+    drone_trackgen_Start_wrapper_accel(%<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>, %<pp3>, %<param_width3>);
+  %else
+    drone_trackgen_Start_wrapper(%<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>, %<pp3>, %<param_width3>);
+  %endif
+
+%endfunction
 %% Function: Outputs ==========================================================
 %%
 %% Purpose:
@@ -106,13 +185,35 @@
 %%
 %function Outputs(block, system) Output
   %%
+  %assign ppw = LibBlockDWorkAddr(PWORK, "", "", 0)
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign nelements1 = LibBlockParameterSize(P1)
+  %assign param_width1 = nelements1[0] * nelements1[1]
+  %if (param_width1) > 1
+    %assign pp1 = LibBlockMatrixParameterBaseAddr(P1)
+  %else
+    %assign pp1 = LibBlockParameterAddr(P1, "", "", 0)
+  %endif
+  %assign nelements2 = LibBlockParameterSize(P2)
+  %assign param_width2 = nelements2[0] * nelements2[1]
+  %if (param_width2) > 1
+    %assign pp2 = LibBlockMatrixParameterBaseAddr(P2)
+  %else
+    %assign pp2 = LibBlockParameterAddr(P2, "", "", 0)
+  %endif
+  %assign nelements3 = LibBlockParameterSize(P3)
+  %assign param_width3 = nelements3[0] * nelements3[1]
+  %if (param_width3) > 1
+    %assign pp3 = LibBlockMatrixParameterBaseAddr(P3)
+  %else
+    %assign pp3 = LibBlockParameterAddr(P3, "", "", 0)
+  %endif
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    drone_trackgen_Outputs_wrapper_accel(%<pu0>, %<py0>);
+    drone_trackgen_Outputs_wrapper_accel(%<pu0>, %<py0>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>, %<pp3>, %<param_width3>);
   %else
-    drone_trackgen_Outputs_wrapper(%<pu0>, %<py0>);
+    drone_trackgen_Outputs_wrapper(%<pu0>, %<py0>, %<ppw>, %<pp1>, %<param_width1>, %<pp2>, %<param_width2>, %<pp3>, %<param_width3>);
   %endif
 
   %%

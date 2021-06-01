@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Thu May 06 13:31:42 2021
+ * Created: Tue Jun 01 22:28:04 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -70,7 +70,19 @@
 #define OUT_0_BIAS            0
 #define OUT_0_SLOPE           0.125
 
-#define NPARAMS               0
+#define NPARAMS               3
+/* Parameter 0 */
+#define PARAMETER_0_NAME      para_role_type
+#define PARAMETER_0_DTYPE     int32_T
+#define PARAMETER_0_COMPLEX   COMPLEX_NO
+/* Parameter 1 */
+#define PARAMETER_1_NAME      para_role_tag
+#define PARAMETER_1_DTYPE     int32_T
+#define PARAMETER_1_COMPLEX   COMPLEX_NO
+/* Parameter 2 */
+#define PARAMETER_2_NAME      para_role_id
+#define PARAMETER_2_DTYPE     int32_T
+#define PARAMETER_2_COMPLEX   COMPLEX_NO
 
 #define SAMPLE_TIME_0         INHERITED_SAMPLE_TIME
 #define NUM_DISC_STATES       0
@@ -90,12 +102,78 @@
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 #include "simstruc.h"
 
+#define PARAM_DEF0(S) ssGetSFcnParam(S, 0)
+#define PARAM_DEF1(S) ssGetSFcnParam(S, 1)
+#define PARAM_DEF2(S) ssGetSFcnParam(S, 2)
 
+#define IS_PARAM_INT32(pVal) (mxIsNumeric(pVal) && !mxIsLogical(pVal) &&\
+!mxIsEmpty(pVal) && !mxIsSparse(pVal) && !mxIsComplex(pVal) && mxIsInt32(pVal))
+
+extern void drone_trackgen_Start_wrapper(void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
 extern void drone_trackgen_Outputs_wrapper(const int32_T *in,
-			int32_T *out);
+			int32_T *out,
+			void **pW,
+			const int32_T *para_role_type, const int_T p_width0,
+			const int32_T *para_role_tag, const int_T p_width1,
+			const int32_T *para_role_id, const int_T p_width2);
 /*====================*
  * S-function methods *
  *====================*/
+#define MDL_CHECK_PARAMETERS
+#if defined(MDL_CHECK_PARAMETERS) && defined(MATLAB_MEX_FILE)
+/* Function: mdlCheckParameters =============================================
+ * Abstract:
+ *     Verify parameter definitions and types.
+ */
+static void mdlCheckParameters(SimStruct *S)
+{
+    int paramIndex  = 0;
+    bool invalidParam = false;
+    /* All parameters must match the S-function Builder Dialog */
+
+    {
+        const mxArray *pVal0 = ssGetSFcnParam(S, 0);
+        if (!IS_PARAM_INT32(pVal0)) {
+            invalidParam = true;
+            paramIndex = 0;
+            goto EXIT_POINT;
+        }
+    }
+
+    {
+        const mxArray *pVal1 = ssGetSFcnParam(S, 1);
+        if (!IS_PARAM_INT32(pVal1)) {
+            invalidParam = true;
+            paramIndex = 1;
+            goto EXIT_POINT;
+        }
+    }
+
+    {
+        const mxArray *pVal2 = ssGetSFcnParam(S, 2);
+        if (!IS_PARAM_INT32(pVal2)) {
+            invalidParam = true;
+            paramIndex = 2;
+            goto EXIT_POINT;
+        }
+    }
+
+
+    EXIT_POINT:
+    if (invalidParam) {
+        static char parameterErrorMsg[1024];
+        sprintf(parameterErrorMsg, "The data type and or complexity of parameter %d does not match the "
+                "information specified in the S-function Builder dialog. "
+                "For non-double parameters you will need to cast them using int8, int16, "
+                "int32, uint8, uint16, uint32 or boolean.", paramIndex + 1);
+        ssSetErrorStatus(S, parameterErrorMsg);
+    }
+    return;
+}
+#endif /* MDL_CHECK_PARAMETERS */
 /* Function: mdlInitializeSizes ===============================================
  * Abstract:
  *   Setup sizes of the various vectors.
@@ -105,14 +183,21 @@ static void mdlInitializeSizes(SimStruct *S)
 
     DECL_AND_INIT_DIMSINFO(inputDimsInfo);
     DECL_AND_INIT_DIMSINFO(outputDimsInfo);
-    ssSetNumSFcnParams(S, NPARAMS);
-    if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
+    ssSetNumSFcnParams(S, NPARAMS); /* Number of expected parameters */
+    #if defined(MATLAB_MEX_FILE)
+    if (ssGetNumSFcnParams(S) == ssGetSFcnParamsCount(S)) {
+        mdlCheckParameters(S);
+        if (ssGetErrorStatus(S) != NULL) {
+            return;
+        }
+    } else {
         return; /* Parameter mismatch will be reported by Simulink */
     }
+    #endif
 
     ssSetArrayLayoutForCodeGen(S, SS_COLUMN_MAJOR);
 
-    ssSetOperatingPointCompliance(S, USE_DEFAULT_OPERATING_POINT);
+    ssSetOperatingPointCompliance(S, DISALLOW_OPERATING_POINT);
 
     ssSetNumContStates(S, NUM_CONT_STATES);
     ssSetNumDiscStates(S, NUM_DISC_STATES);
@@ -138,7 +223,7 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetOutputPortFrameData(S, 0, OUT_0_FRAME_BASED);
     ssSetOutputPortDataType(S, 0, SS_INT32);
     ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
-    ssSetNumPWork(S, 0);
+    ssSetNumPWork(S, 1);
 
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
@@ -184,6 +269,19 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
     ssSetOutputPortDataType(S, 0, SS_DOUBLE);
 }
 
+#define MDL_SET_WORK_WIDTHS
+#if defined(MDL_SET_WORK_WIDTHS) && defined(MATLAB_MEX_FILE)
+
+static void mdlSetWorkWidths(SimStruct *S)
+{
+
+    const char_T *rtParamNames[] = {"P1","P2","P3"};
+    ssRegAllTunableParamsAsRunTimeParams(S, rtParamNames);
+
+}
+
+#endif
+
 #define MDL_START  /* Change to #undef to remove function */
 #if defined(MDL_START)
 /* Function: mdlStart =======================================================
@@ -194,6 +292,15 @@ static void mdlSetDefaultPortDataTypes(SimStruct *S)
  */
 static void mdlStart(SimStruct *S)
 {
+    void **pW = ssGetPWork(S);
+    const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
+    const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
+    const int_T   p_width2  = mxGetNumberOfElements(PARAM_DEF2(S));
+    const int32_T *para_role_type = (const int32_T *) mxGetData(PARAM_DEF0(S));
+    const int32_T *para_role_tag = (const int32_T *) mxGetData(PARAM_DEF1(S));
+    const int32_T *para_role_id = (const int32_T *) mxGetData(PARAM_DEF2(S));
+    
+    drone_trackgen_Start_wrapper(pW, para_role_type, p_width0, para_role_tag, p_width1, para_role_id, p_width2);
 }
 #endif /*  MDL_START */
 
@@ -202,10 +309,17 @@ static void mdlStart(SimStruct *S)
  */
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
+    void **pW = ssGetPWork(S);
     const int32_T *in = (int32_T *) ssGetInputPortRealSignal(S, 0);
     int32_T *out = (int32_T *) ssGetOutputPortRealSignal(S, 0);
-
-    drone_trackgen_Outputs_wrapper(in, out);
+    const int_T   p_width0  = mxGetNumberOfElements(PARAM_DEF0(S));
+    const int_T   p_width1  = mxGetNumberOfElements(PARAM_DEF1(S));
+    const int_T   p_width2  = mxGetNumberOfElements(PARAM_DEF2(S));
+    const int32_T *para_role_type = (const int32_T *) mxGetData(PARAM_DEF0(S));
+    const int32_T *para_role_tag = (const int32_T *) mxGetData(PARAM_DEF1(S));
+    const int32_T *para_role_id = (const int32_T *) mxGetData(PARAM_DEF2(S));
+    
+    drone_trackgen_Outputs_wrapper(in, out, pW, para_role_type, p_width0, para_role_tag, p_width1, para_role_id, p_width2);
 
 }
 

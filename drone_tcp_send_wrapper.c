@@ -43,7 +43,16 @@ void drone_tcp_send_Start_wrapper(void **pW,
 			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
-// malloc pWork memory for socket
+// malloc pWork memory for filename      
+    char role_str[7];
+    sprintf(role_str, "%04d_%02d", para_role_id[0], para_role_tag[0]);
+    
+    char *dirname = "./logs";
+    pW[1] = malloc(strlen(dirname) + 1 + strlen(role_str) + 4);
+    char *fn = (char*) pW[1];
+    sprintf(fn, "%s/%s.txt", dirname, role_str);
+
+    // malloc pWork memory for socket
     pW[0] = malloc(sizeof(SOCKET *));
     
     int iResult;
@@ -51,12 +60,12 @@ void drone_tcp_send_Start_wrapper(void **pW,
     WSADATA wsadata;
     iResult = WSAStartup(MAKEWORD(2, 2), &wsadata);
     if (iResult != 0) {
-        LOG(ERROR, "WSAStartip failed: %d\n", iResult);
+        LOG(ERROR, 1, fn, "WSAStartip failed: %d\n", iResult);
         return;
     }
     // check version
     if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2) {
-        LOG(ERROR, "socket version not match!\n");
+        LOG(ERROR, 1, fn, "socket version not match!\n");
         WSACleanup();
     }
     // store SOCKET object into pWork
@@ -73,11 +82,11 @@ void drone_tcp_send_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, "send server info %s:%s", serverAddr, serverPort);
+    LOG(DEBUG, 1, fn, "send server info %s:%s", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
-        LOG(ERROR, "getaddrinfo failed: %d\n", iResult);
+        LOG(ERROR, 1, fn, "getaddrinfo failed: %d\n", iResult);
         WSACleanup();
         return;
     }
@@ -85,7 +94,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     ptr = result;
     *pSock = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
     if (*pSock == INVALID_SOCKET) {
-        LOG(ERROR, "Error at socket(): %ld\n", WSAGetLastError());
+        LOG(ERROR, 1, fn, "Error at socket(): %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
         return;
@@ -101,15 +110,15 @@ void drone_tcp_send_Start_wrapper(void **pW,
     if (iResult == SOCKET_ERROR) {
         closesocket(*pSock);
         *pSock = INVALID_SOCKET;
-        LOG(ERROR, "send socket connect FAILED!\n");
+        LOG(ERROR, 1, fn, "send socket connect FAILED!\n");
     }
     else {
-        LOG(DEBUG, "send socket connect SUCCESS!");
+        LOG(DEBUG, 1, fn, "send socket connect SUCCESS!");
     }
     
     freeaddrinfo(result);
     if (*pSock == INVALID_SOCKET) {
-        LOG(ERROR, "Unable to connect to server!\n");
+        LOG(ERROR, 1, fn, "Unable to connect to server!\n");
         WSACleanup();
         return;
     }
@@ -117,7 +126,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     Role send_role = {para_role_type[0], para_role_tag[0], para_role_id[0], ROLE_DIR_SEND};
     iResult = send(*pSock, (char *)&send_role, ROLE_SIZE, 0);
     if (iResult == -1) {
-        LOG(ERROR, "send role fail: %d\n", WSAGetLastError());
+        LOG(ERROR, 1, fn, "send role fail: %d\n", WSAGetLastError());
     }
 /* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
 }
@@ -136,8 +145,10 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-if (*received == 0) {
-        LOG(DEBUG, "no receive, no send @%d\n", para_port[0]);
+const char *fn = (char *)pW[1];
+
+    if (*received == 0) {
+        LOG(DEBUG, 1, fn, "no receive, no send @%d\n", para_port[0]);
         return;
     }
 
@@ -149,17 +160,17 @@ if (*received == 0) {
     // Posture buffer = {u0[0], u0[1], u0[2], u0[3], u0[4], u0[5]};
     Posture send_buf;
     memcpy((char *)&send_buf, u0, POSTURE_SIZE);
-    LOG(DEBUG, "will send x = %d, y = %d, z = %d", send_buf.x, send_buf.y, send_buf.z);
+    LOG(DEBUG, 1, fn, "will send x = %d, y = %d, z = %d", send_buf.x, send_buf.y, send_buf.z);
     // send by socket
     iResult = send(*pSock, (char *)&send_buf, POSTURE_SIZE, 0);
-   LOG(DEBUG, "send bytes: %d", iResult);
+   LOG(DEBUG, 1, fn, "send bytes: %d", iResult);
     if (iResult == -1) {
-        LOG(ERROR, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
+        LOG(ERROR, 1, fn, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
     }
 
     // output
     memcpy(y0, (char *)&send_buf, POSTURE_SIZE);
-    LOG(DEBUG, "------------ONE ROUND DONE----------\n");
+    LOG(DEBUG, 1, fn, "------------ONE ROUND DONE----------\n");
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

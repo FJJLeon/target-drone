@@ -9,7 +9,8 @@ const int RECVPACKAGE_SIZE = sizeof(RecvPackage);
 const int ROLE_SIZE = sizeof(Role);
 
 void mylog(const char *func, const char *file, const int line,
-          const int level, const char *format, ...)
+          const int level, const int tolog, const char *fn,
+          const char *format, ...)
 {
     // 日志级别选择
     if (level < LOG_LEVEL) {
@@ -49,8 +50,25 @@ void mylog(const char *func, const char *file, const int line,
     vsnprintf(fmt_str, sizeof(fmt_str), format, ap);
     va_end(ap);
     
-    // 打印日志
+    // 打印日志到 Viewer
     // ssPrintf("[%s]%s[%s@%s:%d] %s\n", level_mark, time_str, func, file, line, fmt_str);
     // 忽略 __FILE__ 打印日志
     ssPrintf("[%s][%s][%s:%d] %s\n", level_mark, time_str, func, line, fmt_str);
+    
+    // 打印日志到 文件
+    //int tolog = 1;
+    //const char *filename = "./logs/firstlog.txt";
+    int ret = -1;
+    FILE *fp = NULL;
+    
+    if (tolog == 1) {
+        fp = fopen(fn, "a+");
+        ret = fprintf(fp, "[%s][%s][%s:%d] %s\n", level_mark, time_str, func, line, fmt_str);
+    }
+    
+    if (ret >= 0) {
+        fflush(fp);
+    }
+    fclose(fp);
+    
 };

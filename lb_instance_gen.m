@@ -1,14 +1,16 @@
 %% 参数指定
 % jcloud 和 se 通讯服务器的IP
 param_jcloud_ip = '[10,119,6,245]';
-param_se_ip     = '[114,55,137,158]';
+param_se_ip     = '[202,120,40,8]';
 
 %% 使用函数生成模型
-% jcloud kine
+%% jcloud
+%% jcloud kine
 instance_generate('model_kinematics', 'jcloud', param_jcloud_ip, 2, 'general');
-% jcloud target
+%% jcloud target
 instance_generate('model_target', 'jcloud', param_jcloud_ip, 2, 'static');
 
+%% se
 % se kine
 instance_generate('model_kinematics', 'se', param_se_ip, 2, 'general');
 % se target
