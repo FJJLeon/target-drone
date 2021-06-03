@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  ------------------------------------------------------------------------- 
  *
- * Created: Thu Jun 03 16:49:55 2021
+ * Created: Thu Jun 03 18:44:27 2021
  */
 
 #define S_FUNCTION_LEVEL 2
@@ -289,7 +289,7 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetOutputPortFrameData(S, 0, OUT_0_FRAME_BASED);
     ssSetOutputPortDataType(S, 0, SS_INT32);
     ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
-    ssSetNumPWork(S, 1);
+    ssSetNumPWork(S, 2);
 
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);

@@ -6,18 +6,23 @@ param_se_ip     = '[202,120,40,8]';
 %% 使用函数生成模型
 %% jcloud
 % jcloud kine
-instance_generate('model_kinematics', 'jcloud', param_jcloud_ip, 2, 'general');
-% jcloud target
-instance_generate('model_target', 'jcloud', param_jcloud_ip, 2, 'static');
+instance_generate('model_kinematics', 'jcloud', param_jcloud_ip, 1, 2, 'general');
+%% jcloud static target
+instance_generate('model_target', 'jcloud', param_jcloud_ip, 1, 2, 'static');
+% jcloud cycle target
+% 同一个 model 注意 id 不能一样
+instance_generate('model_target', 'jcloud', param_jcloud_ip, 3, 4, 'cycle');
 
 %% se
-%% se kine
-instance_generate('model_kinematics', 'se', param_se_ip, 2, 'general');
-%% se target
-instance_generate('model_target', 'se', param_se_ip, 2, 'static');
+% se kine
+instance_generate('model_kinematics', 'se', param_se_ip, 1, 2, 'general');
+%% se static target
+instance_generate('model_target', 'se', param_se_ip, 1, 2, 'static');
+% se cycle target
+instance_generate('model_target', 'se', param_se_ip, 3, 4, 'cycle');
 
 %% 定义模型生成函数
-function instance_generate(model_name, location, ip_addr, count, tag_str)
+function instance_generate(model_name, location, ip_addr, start_id, end_id, tag_str)
     %% 参数表
     arguments
         % 使用的模型名称
@@ -27,13 +32,15 @@ function instance_generate(model_name, location, ip_addr, count, tag_str)
         % 生成模型对应的服务器IP，实际上与位置绑定
         ip_addr  (1,:) char
         % 生成模型数量
-        count    (1,1) int32
+        start_id    (1,1) int32
+        end_id      (1,1) int32
         % 生成的该模型子标签，可选
-        tag_str  (1,:) char {mustBeMember(tag_str,  {'general', 'static'})} = 'general'
+        tag_str  (1,:) char {mustBeMember(tag_str,  {'general', 'static', 'cycle'})} = 'general'
     end
     % 函数功能：生成模型实例
     
     %% 函数代码体 - 准备阶段
+    count = end_id - start_id + 1;
     fprintf('*****位于 %s 的 %s_%s 模型生成准备中，数量 %d 个*****\n', location, tag_str, model_name, count);
     % 载入模型
     model = load_system(model_name);
@@ -79,8 +86,10 @@ function instance_generate(model_name, location, ip_addr, count, tag_str)
     switch tag_str
         case 'general'
             role_tag = int32(0);
-        case 'static'
+        case 'static'% static 是 target 的 tag
             role_tag = int32(1);
+        case 'cycle' % cycle 是 target 的 tag
+            role_tag = int32(2);
         otherwise
             disp('tag_str ERROR');
             return;
@@ -90,7 +99,7 @@ function instance_generate(model_name, location, ip_addr, count, tag_str)
     gen_name = strcat(model_name, '.exe');
     
     %% 函数代码体 - 循环生成阶段
-    for c = 1 : count
+    for c = start_id : end_id
         % 生成实例名，如 jcloud_general_kine_1001.exe，其中
         %   location = jcloud
         %   tag_str  = general

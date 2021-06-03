@@ -8,7 +8,7 @@
 
 // 发送与接收的包结构体
 
-// 战机位姿
+// 战机位姿： 12 个位姿 + 1 个 tic = 13 个 int32
 typedef struct {
     int32_T x; // 位置
     int32_T y;
@@ -26,7 +26,7 @@ typedef struct {
 } Posture;
 extern const int POSTURE_SIZE;
 
-// 接受的操作
+// 接受的操作： 4 个操作量 + 武器 + 步距 = 6 个 int32
 typedef struct {
     int32_T pitch;      // 俯仰
     int32_T roll;       // 翻滚
@@ -37,7 +37,7 @@ typedef struct {
 } Operation;
 extern const int OPERATION_SIZE;
 
-// 接收包
+// 接收包：19 个 int32
 typedef struct {
     Posture post;
     Operation op;  
@@ -86,9 +86,11 @@ typedef struct {
 } Role;
 #define ROLE_TYPE_DRONE 0
 #define ROLE_TYPE_KINE 1
-#define ROLE_TAG_DRONE_STATIC 00
-#define ROLE_TAG_DRONE_CYCLE 01
-#define ROLE_TAG_KINE 10
+
+#define ROLE_TAG_GENERAL 00
+#define ROLE_TAG_TARGET_STATIC 01
+#define ROLE_TAG_TARGET_CYCLE 02
+
 #define ROLE_DIR_RECV 0
 #define ROLE_DIR_SEND 1
 extern const int ROLE_SIZE;

@@ -64,16 +64,39 @@ void drone_trackgen_Outputs_wrapper(const int32_T *in,
     const char *fn = (const char *)pW[0];
     LOG(DEBUG, 1, fn, "input x = %d y = %d z = %d\n", in[0], in[1], in[2]);
     
-     memcpy(out, in, POSTURE_SIZE);
+    // transmission use integer (double x1000 truncation) 
+    
+    switch (para_role_tag[0]) {
+        case ROLE_TAG_TARGET_STATIC: {
+            // direct echo
+            memcpy(out, in, POSTURE_SIZE);
+            break;
+        }
+        case ROLE_TAG_TARGET_CYCLE: {
+            double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;
+            // double theta = atan2(y_in, x_in) - M_PI / 120 * in[17];
+            double theta = atan2(y_in, x_in) - M_PI / 360;
+            LOG(DEBUG, 1, fn, "new theta = %f radian = %f angle\n", theta, theta / M_PI * 180);
+            memcpy(out, in, POSTURE_SIZE);
+            out[0] = (int32_T) (200 * cos(theta) * 1000);
+            out[1] = (int32_T) (200 * sin(theta) * 1000);
+            // z 先不加
+            // 调整偏航角
+            out[5] = (int32_T) ((theta - M_PI/2) * 1000);
+            LOG(DEBUG, 1, fn, "output x = %d y = %d z = %d w = %d\n", out[0], out[1], out[2], out[5]);
+            
+            break;
+        }
+        default:
+            LOG(ERROR, 1, fn, "Role Tag %d Error\n", para_role_tag[0]);
+    }
+    
 
     /*
-    // transmission use integer (double x1000 truncation) 
-    double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;
-    double theta = atan2(y_in, x_in) - M_PI / 120 * in[17];
-    LOG(DEBUG, "new theta = %f radian = %f angle", theta, theta / M_PI * 180);
-
     // 虽然这里的输入有 17 个字段，后 5 个字段为操作，在靶机中用不到
     // 好吧现在多了一个 steps，表示走过的单位步数，要用
+    double x_in = (double)in[0] / 1000, y_in = (double)in[1] / 1000;
+    // double theta = atan2(y_in, x_in) - M_PI / 120 * in[17];
     memcpy(out, in, POSTURE_SIZE);
     out[0] = (int32_T) (200 * cos(theta) * 1000);
     out[1] = (int32_T) (200 * sin(theta) * 1000);
