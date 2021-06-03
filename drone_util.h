@@ -105,4 +105,7 @@ extern void mylog(const char *func, const char *file, const int line,
 
 #define LOG(level, tolog, fn, format, ...) mylog(__func__, __FILE__, __LINE__, level, tolog, fn, format, ##__VA_ARGS__)
 
+extern const char *getLogName(const int32_T role_id, const int32_T role_tag);
+
+
 #endif

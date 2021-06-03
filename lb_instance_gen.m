@@ -5,15 +5,15 @@ param_se_ip     = '[202,120,40,8]';
 
 %% 使用函数生成模型
 %% jcloud
-%% jcloud kine
+% jcloud kine
 instance_generate('model_kinematics', 'jcloud', param_jcloud_ip, 2, 'general');
-%% jcloud target
+% jcloud target
 instance_generate('model_target', 'jcloud', param_jcloud_ip, 2, 'static');
 
 %% se
-% se kine
+%% se kine
 instance_generate('model_kinematics', 'se', param_se_ip, 2, 'general');
-% se target
+%% se target
 instance_generate('model_target', 'se', param_se_ip, 2, 'static');
 
 %% 定义模型生成函数
@@ -38,9 +38,9 @@ function instance_generate(model_name, location, ip_addr, count, tag_str)
     % 载入模型
     model = load_system(model_name);
     % 设置模型 solver
-    set_param('model_kinematics', 'StopTime', 'inf');
-    set_param('model_kinematics', 'Solver', 'FixedStepDiscrete');
-    set_param('model_kinematics', 'FixedStep', '100');
+    set_param(model_name, 'StopTime', 'inf');
+    set_param(model_name, 'Solver', 'FixedStepDiscrete');
+    set_param(model_name, 'FixedStep', '100');
     % 确保模型内的模块是启用状态，即注释commented 是 off
     switch model_name
         case 'model_kinematics'
@@ -106,9 +106,10 @@ function instance_generate(model_name, location, ip_addr, count, tag_str)
         %   实例类型标签(role_tag)，
         %   实例ID(role_id，实例ID第一个数字表征实例类型，便于通讯服务器识别)
         param_str = sprintf('ip_addr = %s; role_type = %d; role_tag = %02d; role_id = %d%03d;', ip_addr, role_type, role_tag, role_type, c);
-        set_param(model, 'PreSaveFcn', param_str);
+        fprintf('模型 PreSaveFcn: %s\n', param_str);
+        set_param(model_name, 'PreSaveFcn', param_str);
         % 保存模型以调用 PreSaveFcn 修改模块参数
-        save_system;
+        save_system(model_name);
         
         % Simulink Coder 代码生成并编译可执行文件
         rtwbuild(model);

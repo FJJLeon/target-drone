@@ -45,14 +45,11 @@ void drone_tcp_recv_Start_wrapper(void **pW,
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
 // malloc pWork memory for filename      
-    char role_str[7];
-    sprintf(role_str, "%04d_%02d", para_role_id[0], para_role_tag[0]);
     
-    char *dirname = "./logs";
-    pW[1] = malloc(strlen(dirname) + 1 + strlen(role_str) + 4);
-    char *fn = (char*) pW[1];
-    sprintf(fn, "%s/%s.txt", dirname, role_str);
-    ssPrintf("LOG FILE: %s\n", fn);
+    pW[1] = getLogName(para_role_id[0], para_role_tag[0]);
+    
+    const char *fn = (const char*) pW[1];
+    LOG(DEBUG, 1, fn, "LOG FILE: %s\n", fn);
     
     
     // malloc pWork memory for socket
@@ -85,7 +82,7 @@ void drone_tcp_recv_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, 1, fn, "server info %s:%s", serverAddr, serverPort);
+    LOG(DEBUG, 1, fn, "server info %s:%s\n", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
@@ -152,7 +149,9 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     
     // retrieve TCP Socket from pWork
     SOCKET *pSock = (SOCKET *)pW[0];
-    const char *fn = (char *)pW[1];
+    // retrieve LOG filename from pWork
+    const char *fn = (const char *)pW[1];
+    
     int iResult;
 
     // recv posture buffer
@@ -161,13 +160,13 @@ void drone_tcp_recv_Outputs_wrapper(int32_T *out,
     // recv by socket
     iResult = recv(*pSock, (char*)&recv_buf, RECVPACKAGE_SIZE, 0);
     if (iResult == -1) {
-        LOG(WARNING, 1, fn, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
+        LOG(WARNING, 1, fn, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
         // TODO, if socket not connect in Start, here error code = 10038 and no timeout wait
         *received = 0;
         return;
     }
-    LOG(DEBUG, 1, fn, "recv bytes %d", iResult);
-    LOG(DEBUG, 1, fn, "recv posture x = %d, y = %d, z = %d", recv_buf.post.x, recv_buf.post.y, recv_buf.post.z);
+    LOG(DEBUG, 1, fn, "recv bytes %d\n", iResult);
+    LOG(DEBUG, 1, fn, "recv posture x = %d, y = %d, z = %d\n", recv_buf.post.x, recv_buf.post.y, recv_buf.post.z);
     // output
     memcpy(out, (char*)&recv_buf, RECVPACKAGE_SIZE);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */

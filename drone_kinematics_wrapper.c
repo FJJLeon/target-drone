@@ -60,11 +60,11 @@ RecvPackage pkg;
     double accelerate = op.accelerate;
     int32_T steps = op.steps;
     
-    /* constraints */
-    roll = roll < -1000 ? -1000 : (roll > 1000 ? 1000 : roll);    // -1000~1000
-    pitch = pitch < -1000 ? -1000 : (pitch > 1000 ? 1000 : pitch);// -1000~1000
-    yaw = yaw < -1000 ? -1000 : (yaw > 1000 ? 1000 : yaw);        // -1000~1000
-    accelerate = accelerate < 0 ? 0 : (accelerate > 1000 ? 1000 : accelerate); // 0~1000
+    /* constraints, move to unity client */
+    // roll = roll < -1000 ? -1000 : (roll > 1000 ? 1000 : roll);    // -1000~1000
+    // pitch = pitch < -1000 ? -1000 : (pitch > 1000 ? 1000 : pitch);// -1000~1000
+    // yaw = yaw < -1000 ? -1000 : (yaw > 1000 ? 1000 : yaw);        // -1000~1000
+    // accelerate = accelerate < 0 ? 0 : (accelerate > 1000 ? 1000 : accelerate); // 0~1000
         
     double unit_w = 0.00005 / 100;
     double w_x = roll  * unit_w * steps;

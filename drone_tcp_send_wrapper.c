@@ -44,13 +44,10 @@ void drone_tcp_send_Start_wrapper(void **pW,
 {
 /* %%%-SFUNWIZ_wrapper_Start_Changes_BEGIN --- EDIT HERE TO _END */
 // malloc pWork memory for filename      
-    char role_str[7];
-    sprintf(role_str, "%04d_%02d", para_role_id[0], para_role_tag[0]);
+    pW[1] = getLogName(para_role_id[0], para_role_tag[0]);
     
-    char *dirname = "./logs";
-    pW[1] = malloc(strlen(dirname) + 1 + strlen(role_str) + 4);
-    char *fn = (char*) pW[1];
-    sprintf(fn, "%s/%s.txt", dirname, role_str);
+    const char *fn = (const char*) pW[1];
+    LOG(DEBUG, 1, fn, "LOG FILE: %s\n", fn);
 
     // malloc pWork memory for socket
     pW[0] = malloc(sizeof(SOCKET *));
@@ -82,7 +79,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
     char serverPort[10];
     sprintf(serverAddr, "%d.%d.%d.%d", para_addr[0], para_addr[1], para_addr[2], para_addr[3]);
     sprintf(serverPort, "%d", para_port[0]);
-    LOG(DEBUG, 1, fn, "send server info %s:%s", serverAddr, serverPort);
+    LOG(DEBUG, 1, fn, "send server info %s:%s\n", serverAddr, serverPort);
     
     iResult = getaddrinfo(serverAddr, serverPort, &hints, &result);
     if (iResult != 0) {
@@ -113,7 +110,7 @@ void drone_tcp_send_Start_wrapper(void **pW,
         LOG(ERROR, 1, fn, "send socket connect FAILED!\n");
     }
     else {
-        LOG(DEBUG, 1, fn, "send socket connect SUCCESS!");
+        LOG(DEBUG, 1, fn, "send socket connect SUCCESS!\n");
     }
     
     freeaddrinfo(result);
@@ -145,7 +142,8 @@ void drone_tcp_send_Outputs_wrapper(const int32_T *u0,
 			const int32_T *para_role_id, const int_T p_width4)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-const char *fn = (char *)pW[1];
+// // retrieve LOG filename from pWork
+    const char *fn = (char *)pW[1];
 
     if (*received == 0) {
         LOG(DEBUG, 1, fn, "no receive, no send @%d\n", para_port[0]);
@@ -160,12 +158,12 @@ const char *fn = (char *)pW[1];
     // Posture buffer = {u0[0], u0[1], u0[2], u0[3], u0[4], u0[5]};
     Posture send_buf;
     memcpy((char *)&send_buf, u0, POSTURE_SIZE);
-    LOG(DEBUG, 1, fn, "will send x = %d, y = %d, z = %d", send_buf.x, send_buf.y, send_buf.z);
+    LOG(DEBUG, 1, fn, "will send x = %d, y = %d, z = %d\n", send_buf.x, send_buf.y, send_buf.z);
     // send by socket
     iResult = send(*pSock, (char *)&send_buf, POSTURE_SIZE, 0);
-   LOG(DEBUG, 1, fn, "send bytes: %d", iResult);
+   LOG(DEBUG, 1, fn, "send bytes: %d\n", iResult);
     if (iResult == -1) {
-        LOG(ERROR, 1, fn, "Error at socket@%d: %ld", para_port[0], WSAGetLastError());
+        LOG(ERROR, 1, fn, "Error at socket@%d: %ld\n", para_port[0], WSAGetLastError());
     }
 
     // output

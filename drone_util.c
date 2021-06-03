@@ -53,7 +53,7 @@ void mylog(const char *func, const char *file, const int line,
     // 打印日志到 Viewer
     // ssPrintf("[%s]%s[%s@%s:%d] %s\n", level_mark, time_str, func, file, line, fmt_str);
     // 忽略 __FILE__ 打印日志
-    ssPrintf("[%s][%s][%s:%d] %s\n", level_mark, time_str, func, line, fmt_str);
+    ssPrintf("[%s][%s][%s:%d] %s", level_mark, time_str, func, line, fmt_str);
     
     // 打印日志到 文件
     //int tolog = 1;
@@ -63,12 +63,28 @@ void mylog(const char *func, const char *file, const int line,
     
     if (tolog == 1) {
         fp = fopen(fn, "a+");
-        ret = fprintf(fp, "[%s][%s][%s:%d] %s\n", level_mark, time_str, func, line, fmt_str);
+        ret = fprintf(fp, "[%s][%s][%s:%d] %s", level_mark, time_str, func, line, fmt_str);
     }
     
     if (ret >= 0) {
         fflush(fp);
+        fclose(fp);
     }
-    fclose(fp);
     
 };
+
+
+
+const char *getLogName(const int32_T role_id, const int32_T role_tag)
+{
+    char role_str[7];
+    sprintf(role_str, "%04d_%02d", role_id, role_tag);
+    
+    const char *dirname = "./logs";
+    const char *postfix= "txt";
+    
+    char *filename = malloc(strlen(dirname) + 1 + strlen(role_str) + 1 + strlen(postfix));
+    sprintf(filename, "%s/%s.%s", dirname, role_str, postfix);  // ./logs/1001_01.txt
+    
+    return filename;
+}

@@ -42,13 +42,10 @@ void drone_trackgen_Start_wrapper(void **pW,
 /*
  * Custom Start code goes here.
  */
-    char role_str[7];
-    sprintf(role_str, "%04d_%02d", para_role_id[0], para_role_tag[0]);
-    
-    char *dirname = "./logs";
-    pW[0] = malloc(strlen(dirname) + 1 + strlen(role_str) + 4);
-    char *fn = (char*) pW[1];
-    sprintf(fn, "%s/%s.txt", dirname, role_str);
+    // malloc pWork memory for filename      
+    pW[0] = getLogName(para_role_id[0], para_role_tag[0]);
+    const char *fn = (const char*) pW[0];
+    LOG(DEBUG, 1, fn, "LOG FILE: %s\n", fn);
 /* %%%-SFUNWIZ_wrapper_Start_Changes_END --- EDIT HERE TO _BEGIN */
 }
 /*
@@ -63,8 +60,9 @@ void drone_trackgen_Outputs_wrapper(const int32_T *in,
 			const int32_T *para_role_id, const int_T p_width2)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-const char *fn = (char *)pW[0];
-    LOG(DEBUG, 1, fn, "input x = %d y = %d z = %d", in[0], in[1], in[2]);
+// retrieve LOG filename from pWork
+    const char *fn = (const char *)pW[0];
+    LOG(DEBUG, 1, fn, "input x = %d y = %d z = %d\n", in[0], in[1], in[2]);
     
      memcpy(out, in, POSTURE_SIZE);
 
